@@ -548,14 +548,26 @@
       return grouped;
     }
 
-    function createImageHTML(src, alt, className, wrapClass) {
-      if (!src) return "";
-      return `
-        <div class="${wrapClass}">
-          <img src="${src}" alt="${alt}" class="${className}" onerror="this.closest('.${wrapClass}').style.display='none'">
-        </div>
-      `;
-    }
+    function createImageHTML(src, alt) {
+  if (!src) return `
+    <div class="tile-image-wrap" style="display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:0.9rem;">
+      No image
+    </div>
+  `;
+
+  return `
+    <div class="tile-image-wrap">
+      <img
+        src="${src}"
+        alt="${alt}"
+        class="tile-image"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+        onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=&quot;display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:0.9rem;&quot;>Image failed to load</div>';"
+      >
+    </div>
+  `;
+}
 
     function renderSidebar(featuredItems) {
       const wrap = document.createElement("div");
