@@ -569,7 +569,7 @@
           ${createImageHTML(featured.image, featured.item, "feature-image", "feature-image-wrap")}
           <div class="feature-kicker">Featured Product</div>
           <h3 class="feature-title">${featured.item}</h3>
-          <div class="feature-copy">${featured.description || "Add a description in your sheet to show extra promo text here."}</div>
+          <div class="feature-copy">${featured.description || ""}</div>
           <div class="feature-price">${money(featured.price)}</div>
         `
         : `
@@ -624,7 +624,7 @@
         head.className = "category-head";
         head.innerHTML = `
           <h2 class="category-title">${category}</h2>
-          <div class="category-sub">Freshly synced from your published sheet</div>
+          <div class="category-sub"></div>
         `;
 
         const itemsWrap = document.createElement("div");
