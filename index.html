@@ -62,13 +62,13 @@
     featureCard.className = "feature-card";
     featureCard.innerHTML = featured
       ? `
-        <div class="feature-kicker">Featured Product</div>
+        <div class="feature-kicker">Featured Item</div>
         <h3 class="feature-title">${featured.item}</h3>
         <div class="feature-copy">${featured.description || "Add a description in your sheet to show extra promo text here."}</div>
         <div class="feature-price">${money(featured.price)}</div>
       `
       : `
-        <div class="feature-kicker">Featured Product</div>
+        <div class="feature-kicker">Featured Item</div>
         <h3 class="feature-title">Spotlight Item</h3>
         <div class="feature-copy">Mark any row as Featured = Yes and it can show up here.</div>
         <div class="feature-price">$0.00</div>
@@ -79,7 +79,7 @@
     infoCard.innerHTML = `
       <h3 class="hours-title">Sheet Setup</h3>
       <div class="hours-line"><span>Tab Name</span><span>Menu</span></div>
-      <div class="hours-line"><span>Column Layout</span><span>A-G</span></div>
+      <div class="hours-line"><span>Columns</span><span>A-G</span></div>
       <div class="hours-line"><span>Featured</span><span>Yes / No</span></div>
       <div class="hours-line"><span>Sort</span><span>Numbers</span></div>
     `;
