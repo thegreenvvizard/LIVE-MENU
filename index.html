@@ -33,9 +33,7 @@
       color: var(--text);
     }
 
-    body {
-      min-height: 100vh;
-    }
+    body { min-height: 100vh; }
 
     .board {
       max-width: 1600px;
@@ -191,9 +189,7 @@
       border: 1px solid rgba(34,197,94,0.18);
     }
 
-    .menu-panel {
-      padding: 18px;
-    }
+    .menu-panel { padding: 18px; }
 
     .menu-grid {
       display: grid;
@@ -236,9 +232,7 @@
       font-size: 0.86rem;
     }
 
-    .items {
-      padding: 8px 18px 14px;
-    }
+    .items { padding: 8px 18px 14px; }
 
     .item {
       padding: 14px 0;
@@ -395,9 +389,7 @@
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
 
-    .hours-line:last-child {
-      border-bottom: 0;
-    }
+    .hours-line:last-child { border-bottom: 0; }
 
     .bottom-note {
       margin-top: 18px;
@@ -411,20 +403,12 @@
     }
 
     @media (max-width: 1250px) {
-      .menu-grid {
-        grid-template-columns: 1fr 1fr;
-      }
+      .menu-grid { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 980px) {
-      .topbar {
-        grid-template-columns: 1fr;
-      }
-
-      .menu-grid {
-        grid-template-columns: 1fr;
-      }
-
+      .topbar { grid-template-columns: 1fr; }
+      .menu-grid { grid-template-columns: 1fr; }
       .bottom-note,
       .status-row {
         flex-direction: column;
@@ -433,21 +417,10 @@
     }
 
     @media (max-width: 640px) {
-      .board {
-        padding: 12px;
-      }
-
-      .brand {
-        padding: 22px;
-      }
-
-      .menu-panel {
-        padding: 14px;
-      }
-
-      .promo-headline {
-        max-width: 100%;
-      }
+      .board { padding: 12px; }
+      .brand { padding: 22px; }
+      .menu-panel { padding: 14px; }
+      .promo-headline { max-width: 100%; }
     }
   </style>
 </head>
@@ -457,7 +430,7 @@
       <div class="brand">
         <div class="eyebrow">Live Inventory • Product Board • Price Updates</div>
         <h1 class="title">Your Store</h1>
-        <div class="subtitle">A premium digital product board with live item names, pricing, tags, and photos pulled from Google Sheets.</div>
+        <div class="subtitle">A premium digital product board with live item names, pricing, tags, and photos pulled from your published Google Sheet.</div>
         <div class="chips">
           <div class="chip">Featured Products</div>
           <div class="chip">New Arrivals</div>
@@ -477,7 +450,7 @@
 
     <section class="menu-panel">
       <div class="status-row">
-        <div id="status" class="status">Loading menu...</div>
+        <div id="status" class="status">Loading board...</div>
         <div class="status-pill">Live Board • Refreshes every 60s</div>
       </div>
 
@@ -485,14 +458,14 @@
     </section>
 
     <section class="bottom-note">
-      <div>Tip: keep your Google Sheet simple and update prices, tags, and photos from your phone or laptop.</div>
+      <div>Tip: update prices, tags, and photos from your sheet.</div>
       <div>Designed for a TV, monitor, tablet, or kiosk display.</div>
     </section>
   </div>
 
   <script>
-    const SHEET_ID = "1Yq0BbyasNmE2Gb5Wq102xKU9_j7gYRawWvGoXFGS_pA";
-    const SHEET_NAME = "Menu";
+    // Your published Google Sheet CSV URL:
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSY4gWBxaMlsabshPp36natpLQfSt-LygQjGdsXgztok_J5w1dg3efZAyP2pqbYy-9ktNZi_1DW5PsF/pub?gid=0&single=true&output=csv";
 
     const statusEl = document.getElementById("status");
     const menuEl = document.getElementById("menu");
@@ -505,36 +478,66 @@
       return cleaned;
     }
 
-    function buildUrl() {
-      const query = encodeURIComponent("select A,B,C,D,E,F,G,H where B is not null order by A asc, F asc");
-      return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tq=${query}`;
+    function parseCSVLine(line) {
+      const result = [];
+      let current = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const next = line[i + 1];
+
+        if (char === '"' && inQuotes && next === '"') {
+          current += '"';
+          i++;
+        } else if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === "," && !inQuotes) {
+          result.push(current);
+          current = "";
+        } else {
+          current += char;
+        }
+      }
+
+      result.push(current);
+      return result.map(v => v.trim());
     }
 
-    function parseGviz(text) {
-      const start = text.indexOf("{");
-      const end = text.lastIndexOf("}");
-      return JSON.parse(text.substring(start, end + 1));
-    }
+    function parseCSV(text) {
+      const lines = text
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n")
+        .split("\n")
+        .filter(line => line.trim() !== "");
 
-    function cellValue(cell) {
-      return cell && cell.v !== undefined ? cell.v : "";
-    }
+      if (!lines.length) return [];
 
-    function normalizeRows(gvizJson) {
-      const rows = (gvizJson.table.rows || []).map(r => {
-        const c = r.c || [];
-        return {
-          category: cellValue(c[0]) || "Menu",
-          item: cellValue(c[1]),
-          description: cellValue(c[2]),
-          price: cellValue(c[3]),
-          featured: String(cellValue(c[4]) || "").toLowerCase(),
-          sort: Number(cellValue(c[5]) || 9999),
-          tag: cellValue(c[6]),
-          image: cellValue(c[7])
-        };
+      const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase());
+
+      return lines.slice(1).map(line => {
+        const values = parseCSVLine(line);
+        const row = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index] ?? "";
+        });
+        return row;
       });
-      return rows.filter(r => r.item);
+    }
+
+    function normalizeRows(rows) {
+      return rows
+        .map(row => ({
+          category: row.category || "Menu",
+          item: row.item || "",
+          description: row.description || "",
+          price: row.price || "",
+          featured: String(row.featured || "").toLowerCase(),
+          sort: Number(row.sort || 9999),
+          tag: row.tag || "",
+          image: row.image || ""
+        }))
+        .filter(row => row.item);
     }
 
     function groupByCategory(rows) {
@@ -542,6 +545,9 @@
       for (const row of rows) {
         if (!grouped[row.category]) grouped[row.category] = [];
         grouped[row.category].push(row);
+      }
+      for (const key in grouped) {
+        grouped[key].sort((a, b) => a.sort - b.sort);
       }
       return grouped;
     }
@@ -581,8 +587,8 @@
       infoCard.className = "hours-card";
       infoCard.innerHTML = `
         <h3 class="hours-title">Sheet Setup</h3>
-        <div class="hours-line"><span>Tab Name</span><span>Menu</span></div>
-        <div class="hours-line"><span>Image Column</span><span>H</span></div>
+        <div class="hours-line"><span>Headers</span><span>Category to Image</span></div>
+        <div class="hours-line"><span>Image Column</span><span>Image</span></div>
         <div class="hours-line"><span>Image Format</span><span>Direct URL</span></div>
         <div class="hours-line"><span>Featured</span><span>Yes / No</span></div>
       `;
@@ -622,7 +628,7 @@
         head.className = "category-head";
         head.innerHTML = `
           <h2 class="category-title">${category}</h2>
-          <div class="category-sub">Freshly synced from your Google Sheet</div>
+          <div class="category-sub">Freshly synced from your published sheet</div>
         `;
 
         const itemsWrap = document.createElement("div");
@@ -663,14 +669,17 @@
 
     async function loadMenu() {
       try {
-        const response = await fetch(buildUrl());
+        const response = await fetch(CSV_URL, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
         const text = await response.text();
-        const json = parseGviz(text);
-        const rows = normalizeRows(json);
+        const parsed = parseCSV(text);
+        const rows = normalizeRows(parsed);
         render(rows);
       } catch (error) {
         console.error(error);
-        statusEl.textContent = "Could not load board. Check that the sheet is shared correctly, the tab name matches, and image URLs are valid.";
+        statusEl.textContent = "Could not load board. Check that the sheet is published, headers match, and image URLs are valid.";
       }
     }
 
@@ -679,4 +688,3 @@
   </script>
 </body>
 </html>
-::contentReference[oaicite:0]{index=0}
