@@ -352,7 +352,7 @@
       Bakery | Blueberry Muffin | Baked fresh each morning | 3.50 | No | 2 |
     */
     const SHEET_ID = "1Yq0BbyasNmE2Gb5Wq102xKU9_j7gYRawWvGoXFGS_pA";
-    const SHEET_NAME = "MENU";
+    const SHEET_NAME = "Menu";
 
     const statusEl = document.getElementById("status");
     const menuEl = document.getElementById("menu");
@@ -367,7 +367,7 @@
 
     function buildUrl() {
       const query = encodeURIComponent("select A,B,C,D,E,F,G where B is not null order by A asc, F asc");
-      return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tq=${query}`;
+      return `https://docs.google.com/spreadsheets/d/${1Yq0BbyasNmE2Gb5Wq102xKU9_j7gYRawWvGoXFGS_pA}/gviz/tq?sheet=${encodeURIComponent(LIVEMENU)}&tq=${query}`;
     }
 
     function parseGviz(text) {
