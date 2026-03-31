@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coffee Shop Digital Menu</title>
+  <style>
+    :root {
+      --bg: #f6f1ea;
+      --bg-soft: #efe6da;
+      --card: #fffaf4;
+      --ink: #2c1f18;
+      --muted: #6b564b;
+      --accent: #7b4b2a;
+      --accent-2: #c98d57;
+      --line: rgba(44, 31, 24, 0.10);
+      --shadow: 0 18px 45px rgba(75, 45, 26, 0.12);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #f8f3ed 0%, #f1e8dc 100%);
+      color: var(--ink);
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .brand-card,
+    .media-card,
+    .category,
+    .info-bar {
+      background: rgba(255, 250, 244, 0.9);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand-card {
+      padding: 34px;
+      background:
+        radial-gradient(circle at top right, rgba(201, 141, 87, 0.18), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,250,244,0.95));
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(123, 75, 42, 0.08);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(2.3rem, 4vw, 4.5rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin-top: 14px;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 1.06rem;
+      line-height: 1.55;
+    }
+
+    .quick-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--bg-soft);
+      color: var(--ink);
+      font-size: 0.92rem;
+      border: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    .media-card {
+      position: relative;
+      min-height: 290px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(44,31,24,0.15), rgba(44,31,24,0.04)),
+        url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+    }
+
+    .media-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: end;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.04), rgba(44,31,24,0.52));
+    }
+
+    .media-text {
+      color: #fff;
+      max-width: 80%;
+    }
+
+    .media-kicker {
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.85;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .media-headline {
+      font-size: clamp(1.4rem, 2vw, 2.1rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin: 0;
+    }
+
+    .info-bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 16px 22px;
+      margin-bottom: 24px;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .note {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 22px;
+    }
+
+    .category {
+      overflow: hidden;
+    }
+
+    .category-head {
+      padding: 20px 22px;
+      background: linear-gradient(180deg, rgba(123,75,42,0.08), rgba(201,141,87,0.05));
+      border-bottom: 1px solid var(--line);
+    }
+
+    .category-title {
+      margin: 0;
+      font-size: 1.5rem;
+      color: var(--accent);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .category-sub {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .items {
+      padding: 10px 20px 18px;
+    }
+
+    .item {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .item:last-child {
+      border-bottom: none;
+      padding-bottom: 6px;
+    }
+
+    .item-top {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .item-name {
+      font-size: 1.08rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .price {
+      color: var(--accent);
+      font-size: 1.08rem;
+      font-weight: 900;
+      white-space: nowrap;
+      padding-left: 10px;
+    }
+
+    .desc {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.45;
+      max-width: 95%;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 9px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(201,141,87,0.14);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-top: 24px;
+      padding-bottom: 10px;
+    }
+
+    @media (max-width: 960px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .media-card {
+        min-height: 230px;
+      }
+
+      .info-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        padding: 16px;
+      }
+
+      .brand-card {
+        padding: 24px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div class="brand-card">
+        <div class="eyebrow">Fresh Coffee • Espresso • Bakery</div>
+        <h1 class="title">Your Coffee Shop</h1>
+        <div class="subtitle">
+          A warm, modern digital menu that updates from Google Sheets. Edit your items, prices, and descriptions in the sheet and refresh the menu screen.
+        </div>
+        <div class="quick-info">
+          <div class="pill">Hot & Iced Drinks</div>
+          <div class="pill">Breakfast</div>
+          <div class="pill">Pastries</div>
+          <div class="pill">Seasonal Specials</div>
+        </div>
+      </div>
+
+      <div class="media-card">
+        <div class="media-overlay">
+          <div class="media-text">
+            <div class="media-kicker">Hero image / promo area</div>
+            <h2 class="media-headline">Swap this image later with your own coffee, logo, or featured item photo.</h2>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="info-bar">
+      <div id="status" class="status">Loading menu...</div>
+      <div class="note">Powered by Google Sheets • Auto-refresh every 60 seconds</div>
+    </section>
+
+    <main id="menu" class="grid"></main>
+
+    <div class="footer">
+      Tip: update the Google Sheet from your phone or computer and this menu can refresh with the new prices and items.
+    </div>
+  </div>
+
+  <script>
+    /*
+      GOOGLE SHEET SETUP
+      1) Rename your tab to Menu (or change SHEET_NAME below)
+      2) Put your sheet ID below
+      3) Share or publish the sheet so it can be read by the menu page
+
+      Columns expected in row 1:
+      Category | Item | Description | Price | Featured | Sort | Tag
+
+      Example rows:
+      Espresso Drinks | Latte | Rich espresso with steamed milk | 4.75 | Yes | 1 | Best Seller
+      Bakery | Blueberry Muffin | Baked fresh each morning | 3.50 | No | 2 |
+    */
+    const SHEET_ID = "PASTE_YOUR_SHEET_ID_HERE";
+    const SHEET_NAME = "Menu";
+
+    const statusEl = document.getElementById("status");
+    const menuEl = document.getElementById("menu");
+
+    function money(value) {
+      if (value === null || value === undefined || value === "") return "";
+      const cleaned = String(value).trim();
+      const num = Number(cleaned.replace(/[^0-9.\-]/g, ""));
+      if (!Number.isNaN(num) && cleaned !== "") return `$${num.toFixed(2)}`;
+      return cleaned;
+    }
+
+    function buildUrl() {
+      const query = encodeURIComponent("select A,B,C,D,E,F,G where B is not null order by A asc, F asc");
+      return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tq=${query}`;
+    }
+
+    function parseGviz(text) {
+      const start = text.indexOf("{");
+      const end = text.lastIndexOf("}");
+      return JSON.parse(text.substring(start, end + 1));
+    }
+
+    function cellValue(cell) {
+      return cell && cell.v !== undefined ? cell.v : "";
+    }
+
+    function normalizeRows(gvizJson) {
+      const rows = (gvizJson.table.rows || []).map(r => {
+        const c = r.c || [];
+        return {
+          category: cellValue(c[0]) || "Menu",
+          item: cellValue(c[1]),
+          description: cellValue(c[2]),
+          price: cellValue(c[3]),
+          featured: String(cellValue(c[4]) || "").toLowerCase(),
+          sort: Number(cellValue(c[5]) || 9999),
+          tag: cellValue(c[6])
+        };
+      });
+      return rows.filter(r => r.item);
+    }
+
+    function groupByCategory(rows) {
+      const grouped = {};
+      for (const row of rows) {
+        if (!grouped[row.category]) grouped[row.category] = [];
+        grouped[row.category].push(row);
+      }
+      return grouped;
+    }
+
+    function render(rows) {
+      const grouped = groupByCategory(rows);
+      const categories = Object.keys(grouped);
+      menuEl.innerHTML = "";
+
+      if (!categories.length) {
+        statusEl.textContent = "No menu items found yet.";
+        return;
+      }
+
+      statusEl.textContent = `Last loaded: ${new Date().toLocaleString()}`;
+
+      for (const category of categories) {
+        const card = document.createElement("section");
+        card.className = "category";
+
+        const head = document.createElement("div");
+        head.className = "category-head";
+        head.innerHTML = `
+          <h2 class="category-title">${category}</h2>
+          <div class="category-sub">Freshly synced from your Google Sheet</div>
+        `;
+
+        const itemsWrap = document.createElement("div");
+        itemsWrap.className = "items";
+
+        for (const item of grouped[category]) {
+          const badges = [];
+          if (item.featured === "yes" || item.featured === "true" || item.featured === "featured") {
+            badges.push('<span class="badge">Featured</span>');
+          }
+          if (item.tag) {
+            badges.push(`<span class="badge">${item.tag}</span>`);
+          }
+
+          const itemEl = document.createElement("div");
+          itemEl.className = "item";
+          itemEl.innerHTML = `
+            <div class="item-top">
+              <div class="item-name">${item.item}</div>
+              <div class="price">${money(item.price)}</div>
+            </div>
+            ${item.description ? `<div class="desc">${item.description}</div>` : ''}
+            ${badges.length ? `<div class="meta">${badges.join('')}</div>` : ''}
+          `;
+          itemsWrap.appendChild(itemEl);
+        }
+
+        card.appendChild(head);
+        card.appendChild(itemsWrap);
+        menuEl.appendChild(card);
+      }
+    }
+
+    async function loadMenu() {
+      try {
+        if (!SHEET_ID || SHEET_ID === "1vSY4gWBxaMlsabshPp36natpLQfSt") {
+          statusEl.textContent = "Paste your Google Sheet ID into the code first.";
+          return;
+        }
+
+        const response = await fetch(buildUrl());
+        const text = await response.text();
+        const json = parseGviz(text);
+        const rows = normalizeRows(json);
+        render(rows);
+      } catch (error) {
+        console.error(error);
+        statusEl.textContent = "Could not load menu. Check that the sheet is published/shared correctly and the tab name matches.";
+      }
+    }
+
+    loadMenu();
+    setInterval(loadMenu, 60000);
+  </script>
+</body>
+</html>
