@@ -1,172 +1,642 @@
-<script>
-  const SHEET_ID = "1Yq0BbyasNmE2Gb5Wq102xKU9_j7gYRawWvGoXFGS_pA";
-  const SHEET_NAME = "Menu";
-
-  const statusEl = document.getElementById("status");
-  const menuEl = document.getElementById("menu");
-
-  function money(value) {
-    if (value === null || value === undefined || value === "") return "";
-    const cleaned = String(value).trim();
-    const num = Number(cleaned.replace(/[^0-9.\-]/g, ""));
-    if (!Number.isNaN(num) && cleaned !== "") return `$${num.toFixed(2)}`;
-    return cleaned;
-  }
-
-  function buildUrl() {
-    const query = encodeURIComponent("select A,B,C,D,E,F,G where B is not null order by A asc, F asc");
-    return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tq=${query}`;
-  }
-
-  function parseGviz(text) {
-    const start = text.indexOf("{");
-    const end = text.lastIndexOf("}");
-    return JSON.parse(text.substring(start, end + 1));
-  }
-
-  function cellValue(cell) {
-    return cell && cell.v !== undefined ? cell.v : "";
-  }
-
-  function normalizeRows(gvizJson) {
-    const rows = (gvizJson.table.rows || []).map(r => {
-      const c = r.c || [];
-      return {
-        category: cellValue(c[0]) || "Menu",
-        item: cellValue(c[1]),
-        description: cellValue(c[2]),
-        price: cellValue(c[3]),
-        featured: String(cellValue(c[4]) || "").toLowerCase(),
-        sort: Number(cellValue(c[5]) || 9999),
-        tag: cellValue(c[6])
-      };
-    });
-    return rows.filter(r => r.item);
-  }
-
-  function groupByCategory(rows) {
-    const grouped = {};
-    for (const row of rows) {
-      if (!grouped[row.category]) grouped[row.category] = [];
-      grouped[row.category].push(row);
-    }
-    return grouped;
-  }
-
-  function renderSidebar(featuredItems) {
-    const wrap = document.createElement("div");
-    wrap.className = "column";
-
-    const featured = featuredItems[0];
-    const featureCard = document.createElement("section");
-    featureCard.className = "feature-card";
-    featureCard.innerHTML = featured
-      ? `
-        <div class="feature-kicker">Featured Item</div>
-        <h3 class="feature-title">${featured.item}</h3>
-        <div class="feature-copy">${featured.description || "Add a description in your sheet to show extra promo text here."}</div>
-        <div class="feature-price">${money(featured.price)}</div>
-      `
-      : `
-        <div class="feature-kicker">Featured Item</div>
-        <h3 class="feature-title">Spotlight Item</h3>
-        <div class="feature-copy">Mark any row as Featured = Yes and it can show up here.</div>
-        <div class="feature-price">$0.00</div>
-      `;
-
-    const infoCard = document.createElement("section");
-    infoCard.className = "hours-card";
-    infoCard.innerHTML = `
-      <h3 class="hours-title">Sheet Setup</h3>
-      <div class="hours-line"><span>Tab Name</span><span>Menu</span></div>
-      <div class="hours-line"><span>Columns</span><span>A-G</span></div>
-      <div class="hours-line"><span>Featured</span><span>Yes / No</span></div>
-      <div class="hours-line"><span>Sort</span><span>Numbers</span></div>
-    `;
-
-    wrap.appendChild(featureCard);
-    wrap.appendChild(infoCard);
-    return wrap;
-  }
-
-  function render(rows) {
-    const grouped = groupByCategory(rows);
-    const categories = Object.keys(grouped);
-    const featuredItems = rows.filter(item => item.featured === "yes" || item.featured === "true" || item.featured === "featured");
-    menuEl.innerHTML = "";
-
-    if (!categories.length) {
-      statusEl.textContent = "No menu items found yet.";
-      return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Menu Board</title>
+  <style>
+    :root {
+      --bg: #1b120d;
+      --panel: #241812;
+      --panel-2: #2d1e17;
+      --panel-3: #36241b;
+      --text: #f8efe6;
+      --muted: #cbb4a1;
+      --accent: #d8a36d;
+      --accent-2: #f3c991;
+      --line: rgba(255,255,255,0.08);
+      --shadow: 0 18px 40px rgba(0,0,0,0.35);
+      --glow: 0 0 0 1px rgba(243,201,145,0.08), 0 0 30px rgba(216,163,109,0.08);
+      --radius: 22px;
     }
 
-    statusEl.textContent = `Last loaded: ${new Date().toLocaleString()}`;
+    * { box-sizing: border-box; }
 
-    const leftCol = document.createElement("div");
-    leftCol.className = "column";
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(216,163,109,0.12), transparent 22%),
+        radial-gradient(circle at top right, rgba(216,163,109,0.08), transparent 18%),
+        linear-gradient(180deg, #140d09 0%, #1b120d 100%);
+      color: var(--text);
+    }
 
-    const middleCol = document.createElement("div");
-    middleCol.className = "column";
+    body {
+      min-height: 100vh;
+    }
 
-    categories.forEach((category, index) => {
-      const card = document.createElement("section");
-      card.className = "category";
+    .board {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 18px;
+    }
 
-      const head = document.createElement("div");
-      head.className = "category-head";
-      head.innerHTML = `
-        <h2 class="category-title">${category}</h2>
-        <div class="category-sub">Freshly synced from your Google Sheet</div>
-      `;
+    .topbar {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
 
-      const itemsWrap = document.createElement("div");
-      itemsWrap.className = "items";
+    .brand,
+    .promo,
+    .menu-panel,
+    .bottom-note {
+      background: linear-gradient(180deg, rgba(54,36,27,0.95), rgba(36,24,18,0.98));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow), var(--glow);
+    }
 
-      for (const item of grouped[category]) {
-        const badges = [];
-        if (item.featured === "yes" || item.featured === "true" || item.featured === "featured") {
-          badges.push('<span class="badge">Featured</span>');
-        }
-        if (item.tag) {
-          badges.push(`<span class="badge">${item.tag}</span>`);
-        }
+    .brand {
+      padding: 28px 30px;
+      position: relative;
+      overflow: hidden;
+    }
 
-        const itemEl = document.createElement("div");
-        itemEl.className = "item";
-        itemEl.innerHTML = `
-          <div class="item-top">
-            <div class="item-name">${item.item}</div>
-            <div class="price">${money(item.price)}</div>
-          </div>
-          ${item.description ? `<div class="desc">${item.description}</div>` : ""}
-          ${badges.length ? `<div class="meta">${badges.join("")}</div>` : ""}
-        `;
-        itemsWrap.appendChild(itemEl);
+    .brand::after {
+      content: "";
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(243,201,145,0.18), transparent 65%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(216,163,109,0.12);
+      color: var(--accent-2);
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(2.2rem, 4.2vw, 4.8rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      margin-top: 12px;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .chip {
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .promo {
+      min-height: 250px;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.5)),
+        url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+    }
+
+    .promo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(10,7,5,0.05), rgba(20,13,9,0.72));
+    }
+
+    .promo-copy {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      z-index: 1;
+    }
+
+    .promo-kicker {
+      color: #fff2df;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+
+    .promo-headline {
+      margin: 0;
+      color: white;
+      font-size: clamp(1.3rem, 2vw, 2.15rem);
+      line-height: 1.1;
+      font-weight: 900;
+      max-width: 80%;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding: 0 2px;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .status-pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(216,163,109,0.12);
+      color: var(--accent-2);
+      font-size: 0.84rem;
+      font-weight: 800;
+      border: 1px solid rgba(216,163,109,0.18);
+    }
+
+    .menu-panel {
+      padding: 18px;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 0.9fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .column {
+      display: grid;
+      gap: 18px;
+    }
+
+    .category {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      min-height: 120px;
+    }
+
+    .category-head {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(216,163,109,0.12), rgba(216,163,109,0.04));
+    }
+
+    .category-title {
+      margin: 0;
+      color: var(--accent-2);
+      font-size: 1.35rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .category-sub {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .items {
+      padding: 8px 18px 14px;
+    }
+
+    .item {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .item:last-child {
+      border-bottom: 0;
+      padding-bottom: 4px;
+    }
+
+    .item-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: baseline;
+      margin-bottom: 5px;
+    }
+
+    .item-name {
+      font-size: 1.08rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .price {
+      color: var(--accent-2);
+      font-size: 1.12rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .desc {
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.42;
+      max-width: 95%;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(216,163,109,0.14);
+      color: var(--accent-2);
+      border: 1px solid rgba(216,163,109,0.12);
+      font-size: 0.75rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .feature-card {
+      background: linear-gradient(180deg, rgba(216,163,109,0.14), rgba(255,255,255,0.03));
+      border: 1px solid rgba(216,163,109,0.18);
+      border-radius: 18px;
+      padding: 18px;
+      min-height: 220px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .feature-kicker {
+      color: var(--accent-2);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.8rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .feature-title {
+      margin: 0;
+      font-size: 1.9rem;
+      line-height: 1;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .feature-copy {
+      color: var(--muted);
+      line-height: 1.5;
+      margin-top: 12px;
+      font-size: 0.96rem;
+    }
+
+    .feature-price {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--accent-2);
+      margin-top: 18px;
+    }
+
+    .hours-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .hours-title {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      color: var(--accent-2);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .hours-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--text);
+      padding: 6px 0;
+      font-size: 0.94rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .hours-line:last-child {
+      border-bottom: 0;
+    }
+
+    .bottom-note {
+      margin-top: 18px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1250px) {
+      .menu-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .topbar {
+        grid-template-columns: 1fr;
       }
 
-      card.appendChild(head);
-      card.appendChild(itemsWrap);
-      (index % 2 === 0 ? leftCol : middleCol).appendChild(card);
-    });
+      .menu-grid {
+        grid-template-columns: 1fr;
+      }
 
-    menuEl.appendChild(leftCol);
-    menuEl.appendChild(middleCol);
-    menuEl.appendChild(renderSidebar(featuredItems));
-  }
-
-  async function loadMenu() {
-    try {
-      const response = await fetch(buildUrl());
-      const text = await response.text();
-      const json = parseGviz(text);
-      const rows = normalizeRows(json);
-      render(rows);
-    } catch (error) {
-      console.error(error);
-      statusEl.textContent = "Could not load menu. Check that the sheet is shared correctly and the tab name matches.";
+      .bottom-note,
+      .status-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
-  }
 
-  loadMenu();
-  setInterval(loadMenu, 60000);
-</script>
+    @media (max-width: 640px) {
+      .board {
+        padding: 12px;
+      }
+
+      .brand {
+        padding: 22px;
+      }
+
+      .menu-panel {
+        padding: 14px;
+      }
+
+      .promo-headline {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="board">
+    <section class="topbar">
+      <div class="brand">
+        <div class="eyebrow">Coffee • Bakery • Breakfast</div>
+        <h1 class="title">Your Coffee Shop</h1>
+        <div class="subtitle">A full digital menu board look with live pricing and items pulled from Google Sheets.</div>
+        <div class="chips">
+          <div class="chip">Hot Coffee</div>
+          <div class="chip">Iced Drinks</div>
+          <div class="chip">Bakery</div>
+          <div class="chip">Breakfast</div>
+          <div class="chip">Seasonal Specials</div>
+        </div>
+      </div>
+
+      <div class="promo">
+        <div class="promo-copy">
+          <div class="promo-kicker">Featured Item Area</div>
+          <h2 class="promo-headline">Swap this with your logo, drink photo, combo special, or seasonal promo.</h2>
+        </div>
+      </div>
+    </section>
+
+    <section class="menu-panel">
+      <div class="status-row">
+        <div id="status" class="status">Loading menu...</div>
+        <div class="status-pill">Live Menu • Refreshes every 60s</div>
+      </div>
+
+      <main id="menu" class="menu-grid"></main>
+    </section>
+
+    <section class="bottom-note">
+      <div>Tip: keep your Google Sheet simple and update prices from your phone or laptop.</div>
+      <div>Design this for a TV, monitor, tablet, or kiosk display.</div>
+    </section>
+  </div>
+
+  <script>
+    const SHEET_ID = "1Yq0BbyasNmE2Gb5Wq102xKU9_j7gYRawWvGoXFGS_pA";
+    const SHEET_NAME = "Menu";
+
+    const statusEl = document.getElementById("status");
+    const menuEl = document.getElementById("menu");
+
+    function money(value) {
+      if (value === null || value === undefined || value === "") return "";
+      const cleaned = String(value).trim();
+      const num = Number(cleaned.replace(/[^0-9.\-]/g, ""));
+      if (!Number.isNaN(num) && cleaned !== "") return `$${num.toFixed(2)}`;
+      return cleaned;
+    }
+
+    function buildUrl() {
+      const query = encodeURIComponent("select A,B,C,D,E,F,G where B is not null order by A asc, F asc");
+      return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tq=${query}`;
+    }
+
+    function parseGviz(text) {
+      const start = text.indexOf("{");
+      const end = text.lastIndexOf("}");
+      return JSON.parse(text.substring(start, end + 1));
+    }
+
+    function cellValue(cell) {
+      return cell && cell.v !== undefined ? cell.v : "";
+    }
+
+    function normalizeRows(gvizJson) {
+      const rows = (gvizJson.table.rows || []).map(r => {
+        const c = r.c || [];
+        return {
+          category: cellValue(c[0]) || "Menu",
+          item: cellValue(c[1]),
+          description: cellValue(c[2]),
+          price: cellValue(c[3]),
+          featured: String(cellValue(c[4]) || "").toLowerCase(),
+          sort: Number(cellValue(c[5]) || 9999),
+          tag: cellValue(c[6])
+        };
+      });
+      return rows.filter(r => r.item);
+    }
+
+    function groupByCategory(rows) {
+      const grouped = {};
+      for (const row of rows) {
+        if (!grouped[row.category]) grouped[row.category] = [];
+        grouped[row.category].push(row);
+      }
+      return grouped;
+    }
+
+    function renderSidebar(featuredItems) {
+      const wrap = document.createElement("div");
+      wrap.className = "column";
+
+      const featured = featuredItems[0];
+      const featureCard = document.createElement("section");
+      featureCard.className = "feature-card";
+      featureCard.innerHTML = featured
+        ? `
+          <div class="feature-kicker">Featured Drink</div>
+          <h3 class="feature-title">${featured.item}</h3>
+          <div class="feature-copy">${featured.description || 'Add a description in your sheet to show extra promo text here.'}</div>
+          <div class="feature-price">${money(featured.price)}</div>
+        `
+        : `
+          <div class="feature-kicker">Featured Drink</div>
+          <h3 class="feature-title">Seasonal Special</h3>
+          <div class="feature-copy">Mark any row as Featured = Yes and it can show up here.</div>
+          <div class="feature-price">$0.00</div>
+        `;
+
+      const hoursCard = document.createElement("section");
+      hoursCard.className = "hours-card";
+      hoursCard.innerHTML = `
+        <h3 class="hours-title">House Info</h3>
+        <div class="hours-line"><span>Mon - Fri</span><span>6:00 AM - 6:00 PM</span></div>
+        <div class="hours-line"><span>Saturday</span><span>7:00 AM - 6:00 PM</span></div>
+        <div class="hours-line"><span>Sunday</span><span>8:00 AM - 4:00 PM</span></div>
+        <div class="hours-line"><span>Wi-Fi</span><span>Available</span></div>
+      `;
+
+      wrap.appendChild(featureCard);
+      wrap.appendChild(hoursCard);
+      return wrap;
+    }
+
+    function render(rows) {
+      const grouped = groupByCategory(rows);
+      const categories = Object.keys(grouped);
+      const featuredItems = rows.filter(item => item.featured === "yes" || item.featured === "true" || item.featured === "featured");
+      menuEl.innerHTML = "";
+
+      if (!categories.length) {
+        statusEl.textContent = "No menu items found yet.";
+        return;
+      }
+
+      statusEl.textContent = `Last loaded: ${new Date().toLocaleString()}`;
+
+      const leftCol = document.createElement("div");
+      leftCol.className = "column";
+
+      const middleCol = document.createElement("div");
+      middleCol.className = "column";
+
+      categories.forEach((category, index) => {
+        const card = document.createElement("section");
+        card.className = "category";
+
+        const head = document.createElement("div");
+        head.className = "category-head";
+        head.innerHTML = `
+          <h2 class="category-title">${category}</h2>
+          <div class="category-sub">Freshly synced from your Google Sheet</div>
+        `;
+
+        const itemsWrap = document.createElement("div");
+        itemsWrap.className = "items";
+
+        for (const item of grouped[category]) {
+          const badges = [];
+          if (item.featured === "yes" || item.featured === "true" || item.featured === "featured") {
+            badges.push('<span class="badge">Featured</span>');
+          }
+          if (item.tag) {
+            badges.push(`<span class="badge">${item.tag}</span>`);
+          }
+
+          const itemEl = document.createElement("div");
+          itemEl.className = "item";
+          itemEl.innerHTML = `
+            <div class="item-top">
+              <div class="item-name">${item.item}</div>
+              <div class="price">${money(item.price)}</div>
+            </div>
+            ${item.description ? `<div class="desc">${item.description}</div>` : ""}
+            ${badges.length ? `<div class="meta">${badges.join("")}</div>` : ""}
+          `;
+          itemsWrap.appendChild(itemEl);
+        }
+
+        card.appendChild(head);
+        card.appendChild(itemsWrap);
+        (index % 2 === 0 ? leftCol : middleCol).appendChild(card);
+      });
+
+      menuEl.appendChild(leftCol);
+      menuEl.appendChild(middleCol);
+      menuEl.appendChild(renderSidebar(featuredItems));
+    }
+
+    async function loadMenu() {
+      try {
+        if (!SHEET_ID || SHEET_ID === "PASTE_YOUR_SHEET_ID_HERE") {
+          statusEl.textContent = "Paste your Google Sheet ID into the code first.";
+          return;
+        }
+
+        const response = await fetch(buildUrl());
+        const text = await response.text();
+        const json = parseGviz(text);
+        const rows = normalizeRows(json);
+        render(rows);
+      } catch (error) {
+        console.error(error);
+        statusEl.textContent = "Could not load menu. Check that the sheet is shared correctly and the tab name matches.";
+      }
+    }
+
+    loadMenu();
+    setInterval(loadMenu, 60000);
+  </script>
+</body>
+</html>
