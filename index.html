@@ -3,117 +3,679 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Live Menu</title>
+  <title>Digital Product Board</title>
   <style>
     :root {
-      --bg: #f6f1ea;
-      --card: #fffaf4;
-      --ink: #2c1f18;
-      --muted: #6b564b;
-      --accent: #7b4b2a;
-      --line: rgba(44, 31, 24, 0.10);
-      --shadow: 0 18px 45px rgba(75, 45, 26, 0.12);
-      --radius: 24px;
+      --bg: #111827;
+      --panel: #18212f;
+      --panel-2: #1f2937;
+      --text: #f9fafb;
+      --muted: #cbd5e1;
+      --accent: #22c55e;
+      --accent-2: #86efac;
+      --line: rgba(255,255,255,0.08);
+      --shadow: 0 18px 40px rgba(0,0,0,0.35);
+      --glow: 0 0 0 1px rgba(134,239,172,0.08), 0 0 30px rgba(34,197,94,0.08);
+      --radius: 22px;
     }
 
     * { box-sizing: border-box; }
 
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
+      min-height: 100%;
       font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(180deg, #f8f3ed 0%, #f1e8dc 100%);
-      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(34,197,94,0.10), transparent 22%),
+        radial-gradient(circle at top right, rgba(34,197,94,0.08), transparent 18%),
+        linear-gradient(180deg, #0b1220 0%, #111827 100%);
+      color: var(--text);
     }
 
-    .shell {
-      max-width: 1400px;
+    body {
+      min-height: 100vh;
+    }
+
+    .board {
+      max-width: 1600px;
       margin: 0 auto;
-      padding: 24px;
+      padding: 18px;
     }
 
-    .hero {
-      background: var(--card);
+    .topbar {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .brand,
+    .promo,
+    .menu-panel,
+    .bottom-note {
+      background: linear-gradient(180deg, rgba(31,41,55,0.96), rgba(24,33,47,0.98));
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 28px;
-      margin-bottom: 20px;
+      box-shadow: var(--shadow), var(--glow);
+    }
+
+    .brand {
+      padding: 28px 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand::after {
+      content: "";
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(134,239,172,0.18), transparent 65%);
+      pointer-events: none;
     }
 
     .eyebrow {
       display: inline-block;
-      padding: 6px 12px;
+      padding: 7px 12px;
       border-radius: 999px;
-      background: rgba(123, 75, 42, 0.08);
-      color: var(--accent);
+      background: rgba(34,197,94,0.12);
+      color: var(--accent-2);
       font-size: 0.8rem;
-      font-weight: 700;
+      font-weight: 800;
       text-transform: uppercase;
-      margin-bottom: 12px;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
     }
 
-    h1 {
+    .title {
       margin: 0;
-      font-size: clamp(2rem, 4vw, 4rem);
-      line-height: 1;
+      font-size: clamp(2.2rem, 4.2vw, 4.8rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
     }
 
-    .sub {
+    .subtitle {
       margin-top: 12px;
+      max-width: 760px;
       color: var(--muted);
       font-size: 1rem;
       line-height: 1.5;
     }
 
-    .frame {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
     }
 
-    iframe {
+    .chip {
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .promo {
+      min-height: 250px;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.5)),
+        url('https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+    }
+
+    .promo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(10,14,20,0.05), rgba(11,18,32,0.72));
+    }
+
+    .promo-copy {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      z-index: 1;
+    }
+
+    .promo-kicker {
+      color: #ecfdf5;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+
+    .promo-headline {
+      margin: 0;
+      color: white;
+      font-size: clamp(1.3rem, 2vw, 2.15rem);
+      line-height: 1.1;
+      font-weight: 900;
+      max-width: 80%;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding: 0 2px;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .status-pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(34,197,94,0.12);
+      color: var(--accent-2);
+      font-size: 0.84rem;
+      font-weight: 800;
+      border: 1px solid rgba(34,197,94,0.18);
+    }
+
+    .menu-panel {
+      padding: 18px;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 0.9fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .column {
+      display: grid;
+      gap: 18px;
+    }
+
+    .category {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      min-height: 120px;
+    }
+
+    .category-head {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(34,197,94,0.12), rgba(34,197,94,0.04));
+    }
+
+    .category-title {
+      margin: 0;
+      color: var(--accent-2);
+      font-size: 1.35rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .category-sub {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .items {
+      padding: 8px 18px 14px;
+    }
+
+    .item {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .item:last-child {
+      border-bottom: 0;
+      padding-bottom: 4px;
+    }
+
+    .item-image-wrap {
+      margin-bottom: 10px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: #0f172a;
+    }
+
+    .item-image {
       display: block;
       width: 100%;
-      height: 78vh;
-      border: 0;
-      background: white;
+      height: 150px;
+      object-fit: cover;
     }
 
-    .footer {
-      text-align: center;
+    .item-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: baseline;
+      margin-bottom: 5px;
+    }
+
+    .item-name {
+      font-size: 1.08rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .price {
+      color: var(--accent-2);
+      font-size: 1.12rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .desc {
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.42;
+      max-width: 95%;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(34,197,94,0.14);
+      color: var(--accent-2);
+      border: 1px solid rgba(34,197,94,0.12);
+      font-size: 0.75rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .feature-card {
+      background: linear-gradient(180deg, rgba(34,197,94,0.14), rgba(255,255,255,0.03));
+      border: 1px solid rgba(34,197,94,0.18);
+      border-radius: 18px;
+      padding: 18px;
+      min-height: 220px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .feature-image-wrap {
+      margin-bottom: 14px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #0f172a;
+    }
+
+    .feature-image {
+      display: block;
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+
+    .feature-kicker {
+      color: var(--accent-2);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.8rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .feature-title {
+      margin: 0;
+      font-size: 1.9rem;
+      line-height: 1;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .feature-copy {
+      color: var(--muted);
+      line-height: 1.5;
+      margin-top: 12px;
+      font-size: 0.96rem;
+    }
+
+    .feature-price {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--accent-2);
+      margin-top: 18px;
+    }
+
+    .hours-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .hours-title {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      color: var(--accent-2);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .hours-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--text);
+      padding: 6px 0;
+      font-size: 0.94rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .hours-line:last-child {
+      border-bottom: 0;
+    }
+
+    .bottom-note {
+      margin-top: 18px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
       color: var(--muted);
       font-size: 0.9rem;
-      margin-top: 14px;
     }
 
-    @media (max-width: 700px) {
-      .shell { padding: 14px; }
-      iframe { height: 72vh; }
+    @media (max-width: 1250px) {
+      .menu-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .menu-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bottom-note,
+      .status-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .board {
+        padding: 12px;
+      }
+
+      .brand {
+        padding: 22px;
+      }
+
+      .menu-panel {
+        padding: 14px;
+      }
+
+      .promo-headline {
+        max-width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <section class="hero">
-      <div class="eyebrow">Live Google Sheets Menu</div>
-      <h1>Your Coffee Shop</h1>
-      <div class="sub">
-        Edit your Google Sheet and the published menu updates automatically.
+  <div class="board">
+    <section class="topbar">
+      <div class="brand">
+        <div class="eyebrow">Live Inventory • Product Board • Price Updates</div>
+        <h1 class="title">Your Store</h1>
+        <div class="subtitle">A premium digital product board with live item names, pricing, tags, and photos pulled from Google Sheets.</div>
+        <div class="chips">
+          <div class="chip">Featured Products</div>
+          <div class="chip">New Arrivals</div>
+          <div class="chip">Top Sellers</div>
+          <div class="chip">Limited Drops</div>
+          <div class="chip">Daily Specials</div>
+        </div>
+      </div>
+
+      <div class="promo">
+        <div class="promo-copy">
+          <div class="promo-kicker">Hero Media Area</div>
+          <h2 class="promo-headline">Swap this with your logo, storefront image, featured brand art, or a store promo graphic.</h2>
+        </div>
       </div>
     </section>
 
-    <section class="frame">
-      <iframe
-        src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSY4gWBxaMlsabshPp36natpLQfSt-LygQjGdsXgztok_J5w1dg3efZAyP2pqbYy-9ktNZi_1DW5PsF/pubhtml?gid=0&single=true&widget=false&headers=false"
-        title="Live Menu">
-      </iframe>
+    <section class="menu-panel">
+      <div class="status-row">
+        <div id="status" class="status">Loading menu...</div>
+        <div class="status-pill">Live Board • Refreshes every 60s</div>
+      </div>
+
+      <main id="menu" class="menu-grid"></main>
     </section>
 
-    <div class="footer">
-      Powered by your published Google Sheet
-    </div>
+    <section class="bottom-note">
+      <div>Tip: keep your Google Sheet simple and update prices, tags, and photos from your phone or laptop.</div>
+      <div>Designed for a TV, monitor, tablet, or kiosk display.</div>
+    </section>
   </div>
+
+  <script>
+    const SHEET_ID = "1Yq0BbyasNmE2Gb5Wq102xKU9_j7gYRawWvGoXFGS_pA";
+    const SHEET_NAME = "Menu";
+
+    const statusEl = document.getElementById("status");
+    const menuEl = document.getElementById("menu");
+
+    function money(value) {
+      if (value === null || value === undefined || value === "") return "";
+      const cleaned = String(value).trim();
+      const num = Number(cleaned.replace(/[^0-9.\-]/g, ""));
+      if (!Number.isNaN(num) && cleaned !== "") return `$${num.toFixed(2)}`;
+      return cleaned;
+    }
+
+    function buildUrl() {
+      const query = encodeURIComponent("select A,B,C,D,E,F,G,H where B is not null order by A asc, F asc");
+      return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tq=${query}`;
+    }
+
+    function parseGviz(text) {
+      const start = text.indexOf("{");
+      const end = text.lastIndexOf("}");
+      return JSON.parse(text.substring(start, end + 1));
+    }
+
+    function cellValue(cell) {
+      return cell && cell.v !== undefined ? cell.v : "";
+    }
+
+    function normalizeRows(gvizJson) {
+      const rows = (gvizJson.table.rows || []).map(r => {
+        const c = r.c || [];
+        return {
+          category: cellValue(c[0]) || "Menu",
+          item: cellValue(c[1]),
+          description: cellValue(c[2]),
+          price: cellValue(c[3]),
+          featured: String(cellValue(c[4]) || "").toLowerCase(),
+          sort: Number(cellValue(c[5]) || 9999),
+          tag: cellValue(c[6]),
+          image: cellValue(c[7])
+        };
+      });
+      return rows.filter(r => r.item);
+    }
+
+    function groupByCategory(rows) {
+      const grouped = {};
+      for (const row of rows) {
+        if (!grouped[row.category]) grouped[row.category] = [];
+        grouped[row.category].push(row);
+      }
+      return grouped;
+    }
+
+    function createImageHTML(src, alt, className, wrapClass) {
+      if (!src) return "";
+      return `
+        <div class="${wrapClass}">
+          <img src="${src}" alt="${alt}" class="${className}" onerror="this.closest('.${wrapClass}').style.display='none'">
+        </div>
+      `;
+    }
+
+    function renderSidebar(featuredItems) {
+      const wrap = document.createElement("div");
+      wrap.className = "column";
+
+      const featured = featuredItems[0];
+      const featureCard = document.createElement("section");
+      featureCard.className = "feature-card";
+      featureCard.innerHTML = featured
+        ? `
+          ${createImageHTML(featured.image, featured.item, "feature-image", "feature-image-wrap")}
+          <div class="feature-kicker">Featured Product</div>
+          <h3 class="feature-title">${featured.item}</h3>
+          <div class="feature-copy">${featured.description || "Add a description in your sheet to show extra promo text here."}</div>
+          <div class="feature-price">${money(featured.price)}</div>
+        `
+        : `
+          <div class="feature-kicker">Featured Product</div>
+          <h3 class="feature-title">Spotlight Item</h3>
+          <div class="feature-copy">Mark any row as Featured = Yes and it can show up here.</div>
+          <div class="feature-price">$0.00</div>
+        `;
+
+      const infoCard = document.createElement("section");
+      infoCard.className = "hours-card";
+      infoCard.innerHTML = `
+        <h3 class="hours-title">Sheet Setup</h3>
+        <div class="hours-line"><span>Tab Name</span><span>Menu</span></div>
+        <div class="hours-line"><span>Image Column</span><span>H</span></div>
+        <div class="hours-line"><span>Image Format</span><span>Direct URL</span></div>
+        <div class="hours-line"><span>Featured</span><span>Yes / No</span></div>
+      `;
+
+      wrap.appendChild(featureCard);
+      wrap.appendChild(infoCard);
+      return wrap;
+    }
+
+    function render(rows) {
+      const grouped = groupByCategory(rows);
+      const categories = Object.keys(grouped);
+      const featuredItems = rows.filter(item =>
+        item.featured === "yes" || item.featured === "true" || item.featured === "featured"
+      );
+
+      menuEl.innerHTML = "";
+
+      if (!categories.length) {
+        statusEl.textContent = "No items found yet.";
+        return;
+      }
+
+      statusEl.textContent = `Last loaded: ${new Date().toLocaleString()}`;
+
+      const leftCol = document.createElement("div");
+      leftCol.className = "column";
+
+      const middleCol = document.createElement("div");
+      middleCol.className = "column";
+
+      categories.forEach((category, index) => {
+        const card = document.createElement("section");
+        card.className = "category";
+
+        const head = document.createElement("div");
+        head.className = "category-head";
+        head.innerHTML = `
+          <h2 class="category-title">${category}</h2>
+          <div class="category-sub">Freshly synced from your Google Sheet</div>
+        `;
+
+        const itemsWrap = document.createElement("div");
+        itemsWrap.className = "items";
+
+        for (const item of grouped[category]) {
+          const badges = [];
+          if (item.featured === "yes" || item.featured === "true" || item.featured === "featured") {
+            badges.push('<span class="badge">Featured</span>');
+          }
+          if (item.tag) {
+            badges.push(`<span class="badge">${item.tag}</span>`);
+          }
+
+          const itemEl = document.createElement("div");
+          itemEl.className = "item";
+          itemEl.innerHTML = `
+            ${createImageHTML(item.image, item.item, "item-image", "item-image-wrap")}
+            <div class="item-top">
+              <div class="item-name">${item.item}</div>
+              <div class="price">${money(item.price)}</div>
+            </div>
+            ${item.description ? `<div class="desc">${item.description}</div>` : ""}
+            ${badges.length ? `<div class="meta">${badges.join("")}</div>` : ""}
+          `;
+          itemsWrap.appendChild(itemEl);
+        }
+
+        card.appendChild(head);
+        card.appendChild(itemsWrap);
+        (index % 2 === 0 ? leftCol : middleCol).appendChild(card);
+      });
+
+      menuEl.appendChild(leftCol);
+      menuEl.appendChild(middleCol);
+      menuEl.appendChild(renderSidebar(featuredItems));
+    }
+
+    async function loadMenu() {
+      try {
+        const response = await fetch(buildUrl());
+        const text = await response.text();
+        const json = parseGviz(text);
+        const rows = normalizeRows(json);
+        render(rows);
+      } catch (error) {
+        console.error(error);
+        statusEl.textContent = "Could not load board. Check that the sheet is shared correctly, the tab name matches, and image URLs are valid.";
+      }
+    }
+
+    loadMenu();
+    setInterval(loadMenu, 60000);
+  </script>
 </body>
 </html>
