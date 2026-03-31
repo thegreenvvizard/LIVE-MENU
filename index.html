@@ -3,20 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Digital Menu Board</title>
+  <title>Digital Product Board</title>
   <style>
     :root {
-      --bg: #1b120d;
-      --panel: #241812;
-      --panel-2: #2d1e17;
-      --panel-3: #36241b;
-      --text: #f8efe6;
-      --muted: #cbb4a1;
-      --accent: #d8a36d;
-      --accent-2: #f3c991;
+      --bg: #111827;
+      --panel: #18212f;
+      --panel-2: #1f2937;
+      --text: #f9fafb;
+      --muted: #cbd5e1;
+      --accent: #22c55e;
+      --accent-2: #86efac;
       --line: rgba(255,255,255,0.08);
       --shadow: 0 18px 40px rgba(0,0,0,0.35);
-      --glow: 0 0 0 1px rgba(243,201,145,0.08), 0 0 30px rgba(216,163,109,0.08);
+      --glow: 0 0 0 1px rgba(134,239,172,0.08), 0 0 30px rgba(34,197,94,0.08);
       --radius: 22px;
     }
 
@@ -28,9 +27,9 @@
       min-height: 100%;
       font-family: Arial, Helvetica, sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(216,163,109,0.12), transparent 22%),
-        radial-gradient(circle at top right, rgba(216,163,109,0.08), transparent 18%),
-        linear-gradient(180deg, #140d09 0%, #1b120d 100%);
+        radial-gradient(circle at top left, rgba(34,197,94,0.10), transparent 22%),
+        radial-gradient(circle at top right, rgba(34,197,94,0.08), transparent 18%),
+        linear-gradient(180deg, #0b1220 0%, #111827 100%);
       color: var(--text);
     }
 
@@ -55,7 +54,7 @@
     .promo,
     .menu-panel,
     .bottom-note {
-      background: linear-gradient(180deg, rgba(54,36,27,0.95), rgba(36,24,18,0.98));
+      background: linear-gradient(180deg, rgba(31,41,55,0.96), rgba(24,33,47,0.98));
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow), var(--glow);
@@ -75,7 +74,7 @@
       width: 180px;
       height: 180px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(243,201,145,0.18), transparent 65%);
+      background: radial-gradient(circle, rgba(134,239,172,0.18), transparent 65%);
       pointer-events: none;
     }
 
@@ -83,7 +82,7 @@
       display: inline-block;
       padding: 7px 12px;
       border-radius: 999px;
-      background: rgba(216,163,109,0.12);
+      background: rgba(34,197,94,0.12);
       color: var(--accent-2);
       font-size: 0.8rem;
       font-weight: 800;
@@ -131,14 +130,14 @@
       overflow: hidden;
       background:
         linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.5)),
-        url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+        url('https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
     }
 
     .promo::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(10,7,5,0.05), rgba(20,13,9,0.72));
+      background: linear-gradient(180deg, rgba(10,14,20,0.05), rgba(11,18,32,0.72));
     }
 
     .promo-copy {
@@ -150,7 +149,7 @@
     }
 
     .promo-kicker {
-      color: #fff2df;
+      color: #ecfdf5;
       font-size: 0.8rem;
       font-weight: 800;
       letter-spacing: 0.08em;
@@ -185,11 +184,11 @@
     .status-pill {
       padding: 8px 12px;
       border-radius: 999px;
-      background: rgba(216,163,109,0.12);
+      background: rgba(34,197,94,0.12);
       color: var(--accent-2);
       font-size: 0.84rem;
       font-weight: 800;
-      border: 1px solid rgba(216,163,109,0.18);
+      border: 1px solid rgba(34,197,94,0.18);
     }
 
     .menu-panel {
@@ -219,7 +218,7 @@
     .category-head {
       padding: 16px 18px;
       border-bottom: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(216,163,109,0.12), rgba(216,163,109,0.04));
+      background: linear-gradient(180deg, rgba(34,197,94,0.12), rgba(34,197,94,0.04));
     }
 
     .category-title {
@@ -249,6 +248,21 @@
     .item:last-child {
       border-bottom: 0;
       padding-bottom: 4px;
+    }
+
+    .item-image-wrap {
+      margin-bottom: 10px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: #0f172a;
+    }
+
+    .item-image {
+      display: block;
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
     }
 
     .item-top {
@@ -291,9 +305,9 @@
       align-items: center;
       padding: 4px 9px;
       border-radius: 999px;
-      background: rgba(216,163,109,0.14);
+      background: rgba(34,197,94,0.14);
       color: var(--accent-2);
-      border: 1px solid rgba(216,163,109,0.12);
+      border: 1px solid rgba(34,197,94,0.12);
       font-size: 0.75rem;
       font-weight: 900;
       text-transform: uppercase;
@@ -301,12 +315,27 @@
     }
 
     .feature-card {
-      background: linear-gradient(180deg, rgba(216,163,109,0.14), rgba(255,255,255,0.03));
-      border: 1px solid rgba(216,163,109,0.18);
+      background: linear-gradient(180deg, rgba(34,197,94,0.14), rgba(255,255,255,0.03));
+      border: 1px solid rgba(34,197,94,0.18);
       border-radius: 18px;
       padding: 18px;
       min-height: 220px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .feature-image-wrap {
+      margin-bottom: 14px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #0f172a;
+    }
+
+    .feature-image {
+      display: block;
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
     }
 
     .feature-kicker {
@@ -426,22 +455,22 @@
   <div class="board">
     <section class="topbar">
       <div class="brand">
-        <div class="eyebrow">Coffee • Bakery • Breakfast</div>
-        <h1 class="title">Your Coffee Shop</h1>
-        <div class="subtitle">A full digital menu board look with live pricing and items pulled from Google Sheets.</div>
+        <div class="eyebrow">Live Inventory • Product Board • Price Updates</div>
+        <h1 class="title">Your Store</h1>
+        <div class="subtitle">A premium digital product board with live item names, pricing, tags, and photos pulled from Google Sheets.</div>
         <div class="chips">
-          <div class="chip">Hot Coffee</div>
-          <div class="chip">Iced Drinks</div>
-          <div class="chip">Bakery</div>
-          <div class="chip">Breakfast</div>
-          <div class="chip">Seasonal Specials</div>
+          <div class="chip">Featured Products</div>
+          <div class="chip">New Arrivals</div>
+          <div class="chip">Top Sellers</div>
+          <div class="chip">Limited Drops</div>
+          <div class="chip">Daily Specials</div>
         </div>
       </div>
 
       <div class="promo">
         <div class="promo-copy">
-          <div class="promo-kicker">Featured Item Area</div>
-          <h2 class="promo-headline">Swap this with your logo, drink photo, combo special, or seasonal promo.</h2>
+          <div class="promo-kicker">Hero Media Area</div>
+          <h2 class="promo-headline">Swap this with your logo, storefront image, featured brand art, or a store promo graphic.</h2>
         </div>
       </div>
     </section>
@@ -449,15 +478,15 @@
     <section class="menu-panel">
       <div class="status-row">
         <div id="status" class="status">Loading menu...</div>
-        <div class="status-pill">Live Menu • Refreshes every 60s</div>
+        <div class="status-pill">Live Board • Refreshes every 60s</div>
       </div>
 
       <main id="menu" class="menu-grid"></main>
     </section>
 
     <section class="bottom-note">
-      <div>Tip: keep your Google Sheet simple and update prices from your phone or laptop.</div>
-      <div>Design this for a TV, monitor, tablet, or kiosk display.</div>
+      <div>Tip: keep your Google Sheet simple and update prices, tags, and photos from your phone or laptop.</div>
+      <div>Designed for a TV, monitor, tablet, or kiosk display.</div>
     </section>
   </div>
 
@@ -477,7 +506,7 @@
     }
 
     function buildUrl() {
-      const query = encodeURIComponent("select A,B,C,D,E,F,G where B is not null order by A asc, F asc");
+      const query = encodeURIComponent("select A,B,C,D,E,F,G,H where B is not null order by A asc, F asc");
       return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tq=${query}`;
     }
 
@@ -501,7 +530,8 @@
           price: cellValue(c[3]),
           featured: String(cellValue(c[4]) || "").toLowerCase(),
           sort: Number(cellValue(c[5]) || 9999),
-          tag: cellValue(c[6])
+          tag: cellValue(c[6]),
+          image: cellValue(c[7])
         };
       });
       return rows.filter(r => r.item);
@@ -516,6 +546,15 @@
       return grouped;
     }
 
+    function createImageHTML(src, alt, className, wrapClass) {
+      if (!src) return "";
+      return `
+        <div class="${wrapClass}">
+          <img src="${src}" alt="${alt}" class="${className}" onerror="this.closest('.${wrapClass}').style.display='none'">
+        </div>
+      `;
+    }
+
     function renderSidebar(featuredItems) {
       const wrap = document.createElement("div");
       wrap.className = "column";
@@ -525,41 +564,45 @@
       featureCard.className = "feature-card";
       featureCard.innerHTML = featured
         ? `
-          <div class="feature-kicker">Featured Drink</div>
+          ${createImageHTML(featured.image, featured.item, "feature-image", "feature-image-wrap")}
+          <div class="feature-kicker">Featured Product</div>
           <h3 class="feature-title">${featured.item}</h3>
-          <div class="feature-copy">${featured.description || 'Add a description in your sheet to show extra promo text here.'}</div>
+          <div class="feature-copy">${featured.description || "Add a description in your sheet to show extra promo text here."}</div>
           <div class="feature-price">${money(featured.price)}</div>
         `
         : `
-          <div class="feature-kicker">Featured Drink</div>
-          <h3 class="feature-title">Seasonal Special</h3>
+          <div class="feature-kicker">Featured Product</div>
+          <h3 class="feature-title">Spotlight Item</h3>
           <div class="feature-copy">Mark any row as Featured = Yes and it can show up here.</div>
           <div class="feature-price">$0.00</div>
         `;
 
-      const hoursCard = document.createElement("section");
-      hoursCard.className = "hours-card";
-      hoursCard.innerHTML = `
-        <h3 class="hours-title">House Info</h3>
-        <div class="hours-line"><span>Mon - Fri</span><span>6:00 AM - 6:00 PM</span></div>
-        <div class="hours-line"><span>Saturday</span><span>7:00 AM - 6:00 PM</span></div>
-        <div class="hours-line"><span>Sunday</span><span>8:00 AM - 4:00 PM</span></div>
-        <div class="hours-line"><span>Wi-Fi</span><span>Available</span></div>
+      const infoCard = document.createElement("section");
+      infoCard.className = "hours-card";
+      infoCard.innerHTML = `
+        <h3 class="hours-title">Sheet Setup</h3>
+        <div class="hours-line"><span>Tab Name</span><span>Menu</span></div>
+        <div class="hours-line"><span>Image Column</span><span>H</span></div>
+        <div class="hours-line"><span>Image Format</span><span>Direct URL</span></div>
+        <div class="hours-line"><span>Featured</span><span>Yes / No</span></div>
       `;
 
       wrap.appendChild(featureCard);
-      wrap.appendChild(hoursCard);
+      wrap.appendChild(infoCard);
       return wrap;
     }
 
     function render(rows) {
       const grouped = groupByCategory(rows);
       const categories = Object.keys(grouped);
-      const featuredItems = rows.filter(item => item.featured === "yes" || item.featured === "true" || item.featured === "featured");
+      const featuredItems = rows.filter(item =>
+        item.featured === "yes" || item.featured === "true" || item.featured === "featured"
+      );
+
       menuEl.innerHTML = "";
 
       if (!categories.length) {
-        statusEl.textContent = "No menu items found yet.";
+        statusEl.textContent = "No items found yet.";
         return;
       }
 
@@ -597,6 +640,7 @@
           const itemEl = document.createElement("div");
           itemEl.className = "item";
           itemEl.innerHTML = `
+            ${createImageHTML(item.image, item.item, "item-image", "item-image-wrap")}
             <div class="item-top">
               <div class="item-name">${item.item}</div>
               <div class="price">${money(item.price)}</div>
@@ -619,11 +663,6 @@
 
     async function loadMenu() {
       try {
-        if (!SHEET_ID || SHEET_ID === "PASTE_YOUR_SHEET_ID_HERE") {
-          statusEl.textContent = "Paste your Google Sheet ID into the code first.";
-          return;
-        }
-
         const response = await fetch(buildUrl());
         const text = await response.text();
         const json = parseGviz(text);
@@ -631,7 +670,7 @@
         render(rows);
       } catch (error) {
         console.error(error);
-        statusEl.textContent = "Could not load menu. Check that the sheet is shared correctly and the tab name matches.";
+        statusEl.textContent = "Could not load board. Check that the sheet is shared correctly, the tab name matches, and image URLs are valid.";
       }
     }
 
