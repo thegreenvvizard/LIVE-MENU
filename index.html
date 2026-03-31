@@ -338,19 +338,6 @@
   </div>
 
   <script>
-    /*
-      GOOGLE SHEET SETUP
-      1) Rename your tab to Menu (or change SHEET_NAME below)
-      2) Put your sheet ID below
-      3) Share or publish the sheet so it can be read by the menu page
-
-      Columns expected in row 1:
-      Category | Item | Description | Price | Featured | Sort | Tag
-
-      Example rows:
-      Espresso Drinks | Latte | Rich espresso with steamed milk | 4.75 | Yes | 1 | Best Seller
-      Bakery | Blueberry Muffin | Baked fresh each morning | 3.50 | No | 2 |
-    */
     const SHEET_ID = "1Yq0BbyasNmE2Gb5Wq102xKU9_j7gYRawWvGoXFGS_pA";
     const SHEET_NAME = "Menu";
 
@@ -367,7 +354,7 @@
 
     function buildUrl() {
       const query = encodeURIComponent("select A,B,C,D,E,F,G where B is not null order by A asc, F asc");
-      return `https://docs.google.com/spreadsheets/d/${1Yq0BbyasNmE2Gb5Wq102xKU9_j7gYRawWvGoXFGS_pA}/gviz/tq?sheet=${encodeURIComponent(LIVEMENU)}&tq=${query}`;
+      return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tq=${query}`;
     }
 
     function parseGviz(text) {
@@ -447,8 +434,8 @@
               <div class="item-name">${item.item}</div>
               <div class="price">${money(item.price)}</div>
             </div>
-            ${item.description ? `<div class="desc">${item.description}</div>` : ''}
-            ${badges.length ? `<div class="meta">${badges.join('')}</div>` : ''}
+            ${item.description ? `<div class="desc">${item.description}</div>` : ""}
+            ${badges.length ? `<div class="meta">${badges.join("")}</div>` : ""}
           `;
           itemsWrap.appendChild(itemEl);
         }
@@ -461,7 +448,7 @@
 
     async function loadMenu() {
       try {
-        if (!SHEET_ID || SHEET_ID === "1Yq0BbyasNmE2Gb5Wq102xKU9_j7gYRawWvGoXFGS_pA") {
+        if (!SHEET_ID || SHEET_ID === "PASTE_YOUR_SHEET_ID_HERE") {
           statusEl.textContent = "Paste your Google Sheet ID into the code first.";
           return;
         }
