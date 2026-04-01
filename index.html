@@ -239,6 +239,11 @@
       border-bottom: 1px solid var(--line);
     }
 
+    .item.out-of-stock-item {
+      opacity: 0.52;
+      filter: saturate(0.8);
+    }
+
     .item:last-child {
       border-bottom: 0;
       padding-bottom: 4px;
@@ -568,15 +573,32 @@
         .filter(row => row.item);
     }
 
+    function getStockNumber(qty) {
+      if (qty === null || qty === undefined || qty === "") return null;
+      const num = Number(String(qty).replace(/[^0-9.\-]/g, ""));
+      return Number.isNaN(num) ? null : num;
+    }
+
     function groupByCategory(rows) {
       const grouped = {};
       for (const row of rows) {
         if (!grouped[row.category]) grouped[row.category] = [];
         grouped[row.category].push(row);
       }
+
       for (const key in grouped) {
-        grouped[key].sort((a, b) => a.sort - b.sort);
+        grouped[key].sort((a, b) => {
+          const aStock = getStockNumber(a.qty);
+          const bStock = getStockNumber(b.qty);
+
+          const aOut = aStock !== null && aStock <= 0 ? 1 : 0;
+          const bOut = bStock !== null && bStock <= 0 ? 1 : 0;
+
+          if (aOut !== bOut) return aOut - bOut;
+          return a.sort - b.sort;
+        });
       }
+
       return grouped;
     }
 
@@ -587,12 +609,6 @@
           <img src="${src}" alt="${alt}" class="${className}" onerror="this.closest('.${wrapClass}').style.display='none'">
         </div>
       `;
-    }
-
-    function getStockNumber(qty) {
-      if (qty === null || qty === undefined || qty === "") return null;
-      const num = Number(String(qty).replace(/[^0-9.\-]/g, ""));
-      return Number.isNaN(num) ? null : num;
     }
 
     function getStockBadge(qty) {
@@ -704,8 +720,11 @@
             badges.push(getStockBadge(item.qty));
           }
 
+          const stockNum = getStockNumber(item.qty);
+          const isOutOfStock = stockNum !== null && stockNum <= 0;
+
           const itemEl = document.createElement("div");
-          itemEl.className = "item";
+          itemEl.className = `item${isOutOfStock ? " out-of-stock-item" : ""}`;
           itemEl.innerHTML = `
             ${createImageHTML(item.image, item.item, "item-image", "item-image-wrap")}
             <div class="item-top">
